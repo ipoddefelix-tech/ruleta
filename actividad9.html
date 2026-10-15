@@ -1,0 +1,294 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Actividad 9. Interrogativa</title>
+
+<style>
+
+body{
+    font-family: Arial, sans-serif;
+    background:#ececec;
+    text-align:center;
+    padding:20px;
+}
+
+h1{
+    font-size:42px;
+    margin-bottom:30px;
+}
+
+.paneles{
+    display:flex;
+    justify-content:center;
+    gap:25px;
+    flex-wrap:wrap;
+}
+
+.panel{
+    width:220px;
+    height:180px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:90px;
+    font-weight:bold;
+    color:white;
+    border-radius:20px;
+    box-shadow:0 6px 15px rgba(0,0,0,.25);
+    transition:all .15s ease;
+}
+
+.panel1{
+    background:#4169E1;
+}
+
+.panel2{
+    background:#FF6A13;
+}
+
+.panel3{
+    background:#6B8E23;
+}
+
+.activo{
+    transform:scale(1.12);
+    border:6px solid gold;
+    box-shadow:
+        0 0 20px gold,
+        0 0 40px gold,
+        0 0 60px gold;
+}
+
+.ganador{
+    border:8px solid gold;
+    box-shadow:
+        0 0 25px gold,
+        0 0 50px gold,
+        0 0 90px gold;
+}
+
+.usado{
+    opacity:.55;
+    filter:grayscale(70%);
+}
+
+button{
+    margin-top:30px;
+    padding:15px 45px;
+    font-size:24px;
+    border:none;
+    border-radius:10px;
+    background:#222;
+    color:white;
+    cursor:pointer;
+}
+
+button:hover{
+    background:black;
+}
+
+button:disabled{
+    background:gray;
+    cursor:not-allowed;
+}
+
+#resultadoCard{
+    margin-top:35px;
+    background:white;
+    border-radius:20px;
+    padding:30px;
+    max-width:1200px;
+    margin-left:auto;
+    margin-right:auto;
+    box-shadow:0 8px 25px rgba(0,0,0,.20);
+    min-height:200px;
+}
+
+#numero{
+    font-size:42px;
+    font-weight:bold;
+}
+
+#pregunta{
+    margin-top:20px;
+    font-size:52px;
+    font-weight:900;
+    line-height:1.25;
+    color:#111;
+}
+
+@keyframes celebrar{
+
+    0%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.04);
+    }
+
+    100%{
+        transform:scale(1);
+    }
+
+}
+
+.celebracion{
+    animation:celebrar .7s ease-in-out 3;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>Actividad 9. Interrogativa</h1>
+
+<div class="paneles">
+
+    <div class="panel panel1" id="p1">1</div>
+
+    <div class="panel panel2" id="p2">2</div>
+
+    <div class="panel panel3" id="p3">3</div>
+
+</div>
+
+<button id="btn" onclick="seleccionar()">
+SELECCIONAR
+</button>
+
+<div id="resultadoCard">
+
+    <div id="numero"></div>
+
+    <div id="pregunta">
+        Presiona el botón para comenzar.
+    </div>
+
+</div>
+
+<audio id="audioVictoria" preload="auto">
+    <source src="https://nu.vgmtreasurechest.com/soundtracks/international-superstar-soccer-64-n64/fvmxctnj/01.%20Major%20A%20Productions.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+
+const preguntas = {
+
+    1: "¿Quiénes realizan las solicitudes de material bibliográfico?",
+
+    2: "¿Cómo se selecciona el proveedor de material bibliográfico?",
+
+    3: "¿Cuáles son las formas para realizar una cotización de material? Explique."
+
+};
+
+let disponibles = [1,2,3];
+
+function seleccionar(){
+
+    if(disponibles.length === 0){
+
+        document.getElementById("numero").innerHTML =
+        "✅ DINÁMICA TERMINADA";
+
+        document.getElementById("pregunta").innerHTML =
+        "Todas las preguntas ya fueron utilizadas.";
+
+        document.getElementById("btn").disabled = true;
+
+        return;
+    }
+
+    document.getElementById("numero").innerHTML = "";
+    document.getElementById("pregunta").innerHTML = "";
+
+    const paneles = [1,2,3];
+
+    let contador = 0;
+
+    // INICIAR EL AUDIO AL COMENZAR LA SELECCIÓN
+    const audio = document.getElementById("audioVictoria");
+
+    audio.currentTime = 0;
+
+    audio.play().catch(() => {});
+
+    const animacion = setInterval(() => {
+
+        paneles.forEach(n => {
+
+            document.getElementById("p"+n)
+            .classList.remove("activo");
+
+        });
+
+        const aleatorio =
+        paneles[Math.floor(Math.random()*3)];
+
+        document.getElementById("p"+aleatorio)
+        .classList.add("activo");
+
+        contador++;
+
+        if(contador >= 70){
+
+            clearInterval(animacion);
+
+            // DETENER EL AUDIO CUANDO TERMINA LA SELECCIÓN
+            audio.pause();
+            audio.currentTime = 0;
+
+            const indice =
+            Math.floor(Math.random()*disponibles.length);
+
+            const ganador =
+            disponibles[indice];
+
+            disponibles.splice(indice,1);
+
+            paneles.forEach(n => {
+
+                document.getElementById("p"+n)
+                .classList.remove("activo");
+
+            });
+
+            const panel =
+            document.getElementById("p"+ganador);
+
+            panel.classList.add("ganador");
+            panel.classList.add("usado");
+
+            panel.innerHTML = "✅";
+
+            document.getElementById("numero").innerHTML =
+            " PREGUNTA " + ganador;
+
+            document.getElementById("pregunta").innerHTML =
+            preguntas[ganador];
+
+            const tarjeta =
+            document.getElementById("resultadoCard");
+
+            tarjeta.classList.remove("celebracion");
+
+            void tarjeta.offsetWidth;
+
+            tarjeta.classList.add("celebracion");
+
+        }
+
+    },100);
+
+}
+
+</script>
+
+</body>
+</html>
+```
